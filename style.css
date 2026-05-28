@@ -1,0 +1,401 @@
+/* =========================
+   RESET E VARIÁVEIS
+========================= */
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Segoe UI', Tahoma, sans-serif; 
+}
+
+/* TEMA CLARO — azul suave igual às imagens */
+:root {
+    --primary:    #3a8ef6;
+    --grad-start: #6ab8fb;
+    --grad-end:   #3a8ef6;
+
+    --bg-body:  #b8d8f8;
+    --bg-app:   #daeeff;
+    --bg-card:  #ffffff;
+
+    --text-main: #1a3a5c;
+    --text-sec:  #7a9cbf;
+
+    --input-bg: #f0f6ff;
+    --border:   rgba(58, 142, 246, 0.18);
+    --shadow:   rgba(58, 142, 246, 0.20);
+
+    --success: #28a745;
+    --danger:  #dc3545;
+}
+
+/* TEMA ESCURO — vermelho igual às imagens */
+body.dark-theme {
+    --primary:    #ff1a1a;
+    --grad-start: #cc0000;
+    --grad-end:   #7a0000;
+
+    --bg-body:  #1a0000;
+    --bg-app:   #120000;
+    --bg-card:  rgba(55, 0, 0, 0.70);
+
+    --text-main: #f5f5f5;
+    --text-sec:  rgba(255, 255, 255, 0.45);
+
+    --input-bg: rgba(25, 0, 0, 0.80);
+    --border:   rgba(255, 60, 60, 0.18);
+    --shadow:   rgba(200, 0, 0, 0.45);
+
+    --success: #28a745;
+    --danger:  #ff1a1a;
+}
+
+/* Fundo com glow azul claro no tema padrão */
+body {
+    background: radial-gradient(ellipse at 30% 20%, #c5e3ff 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 80%, #a8d4f5 0%, transparent 60%),
+                #b8d8f8;
+    color: var(--text-main);
+    transition: background 0.4s, color 0.3s;
+}
+
+/* Fundo com glow vermelho no tema escuro */
+body.dark-theme {
+    background: radial-gradient(ellipse at 20% 30%, #cc000055 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 70%, #aa000044 0%, transparent 55%),
+                #120000;
+}
+
+.app-container {
+    max-width: 480px; 
+    margin: 0 auto; 
+    background: var(--bg-app);
+    min-height: 100vh; 
+    position: relative; 
+    overflow-x: hidden; 
+    box-shadow: 0 0 40px var(--shadow);
+}
+
+/* Glassmorphism - Efeito Vidro */
+.glass-panel {
+    background: var(--bg-card); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border); 
+    border-radius: 20px; 
+    box-shadow: 0 8px 32px var(--shadow); 
+    padding: 25px;
+}
+
+/* Glow nos cards no tema escuro */
+body.dark-theme .glass-panel {
+    box-shadow: 0 8px 32px rgba(200, 0, 0, 0.35), 0 0 0 1px rgba(255,60,60,0.10);
+}
+
+.wave-top {
+    height: 140px; 
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    border-bottom-left-radius: 30px; 
+    border-bottom-right-radius: 30px; 
+    position: absolute; 
+    top: 0; 
+    width: 100%; 
+    z-index: 1;
+}
+
+.theme-toggle {
+    position: absolute; 
+    top: 15px; 
+    right: 15px; 
+    z-index: 10; 
+    background: rgba(255,255,255,0.25);
+    border: none; 
+    color: white; 
+    padding: 10px; 
+    border-radius: 50%; 
+    cursor: pointer; 
+    backdrop-filter: blur(5px);
+    transition: background 0.3s;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.4); }
+
+.screen { 
+    display: none; 
+    position: relative; 
+    z-index: 2; 
+    margin-top: 80px; 
+    padding: 0 20px; 
+}
+.screen.active { 
+    display: block; 
+    animation: fadeIn 0.4s ease; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to   { opacity: 1; transform: translateY(0); } 
+}
+
+.header-user { text-align: center; margin-bottom: 20px; }
+.balance-card { text-align: center; margin-bottom: 20px; }
+.balance-card h1 { font-size: 32px; color: var(--primary); margin-top: 5px; transition: color 0.3s ease; }
+
+.input-group {
+    position: relative;
+    display: flex; 
+    align-items: center; 
+    background: var(--input-bg); 
+    padding: 13px 15px;
+    border-radius: 12px; 
+    margin-bottom: 12px; 
+    border: 1px solid var(--border); 
+    transition: border 0.3s, box-shadow 0.3s;
+}
+.password-group {
+    padding-right: 45px;
+}
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--text-sec);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 6px;
+}
+.password-toggle:hover {
+    color: var(--primary);
+}
+.input-group:focus-within { 
+    border-color: var(--primary); 
+    box-shadow: 0 0 0 3px rgba(58,142,246,0.12);
+}
+body.dark-theme .input-group:focus-within {
+    border-color: rgba(255, 60, 60, 0.55);
+    box-shadow: 0 0 0 3px rgba(255,30,30,0.12);
+}
+.input-group i { color: var(--primary); width: 25px; text-align: center; }
+.input-group input, .input-group select { 
+    border: none; 
+    outline: none; 
+    background: transparent; 
+    width: 100%; 
+    color: var(--text-main); 
+    font-size: 15px; 
+    margin-left: 10px; 
+}
+.input-group input::placeholder { color: var(--text-sec); }
+
+.btn-primary {
+    width: 100%; 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    padding: 15px;
+    border-radius: 12px; 
+    font-size: 16px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px var(--shadow);
+}
+.google-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: white;
+    color: #202124;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.15s;
+}
+.google-btn i {
+    font-size: 18px;
+}
+.google-btn:hover {
+    box-shadow: 0 6px 22px rgba(60, 64, 67, 0.15);
+    transform: translateY(-1px);
+}
+.btn-primary:hover  { box-shadow: 0 6px 22px var(--shadow); }
+.btn-primary:active { transform: scale(0.98); }
+
+/* Botão vermelho com glow no tema escuro */
+body.dark-theme .btn-primary {
+    background: #e00000;
+    box-shadow: 0 4px 20px rgba(220, 0, 0, 0.55);
+}
+body.dark-theme .btn-primary:hover {
+    background: #ff1a1a;
+    box-shadow: 0 6px 28px rgba(255, 30, 30, 0.70);
+}
+
+.tab-content { display: none; margin-bottom: 15px; }
+.tab-content.active { display: block; animation: fadeIn 0.4s; }
+
+.list-item { 
+    background: var(--input-bg); 
+    padding: 15px; 
+    border-radius: 12px; 
+    margin-bottom: 10px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border: 1px solid var(--border); 
+    transition: box-shadow 0.2s;
+}
+.list-item:hover { box-shadow: 0 4px 12px var(--shadow); }
+.list-item h4 { font-size: 15px; color: var(--text-main); }
+.list-item p  { font-size: 12px; color: var(--text-sec); }
+
+/* Progress Bar Metas */
+.progress-bg   { background: var(--border); border-radius: 10px; height: 8px; width: 100%; margin-top: 8px; overflow: hidden; }
+.progress-fill { background: var(--primary); height: 100%; transition: width 0.5s ease-in-out; }
+
+/* =========================
+   MENU INFERIOR
+========================= */
+.bottom-nav { 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 8px 0;
+    z-index: 20; 
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.bottom-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-item { 
+    background: none; 
+    border: none; 
+    color: var(--text-sec); 
+    font-size: 10px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    cursor: pointer; 
+    transition: color 0.3s; 
+    padding: 2px 5px;
+}
+.nav-item i { font-size: 18px; margin-bottom: 2px; }
+.nav-item.active { color: var(--primary); font-weight: bold; }
+.nav-item.active i { transform: translateY(-2px); }
+
+/* =========================
+   MOBILE RESPONSIVO
+========================= */
+@media (max-width: 480px) {
+    .screen {
+        margin-top: 70px;
+        padding: 0 12px;
+    }
+
+    .glass-panel {
+        padding: 18px 14px;
+        border-radius: 16px;
+    }
+
+    .balance-card h1 {
+        font-size: 26px;
+    }
+
+    /* Botões do header menores mas clicáveis */
+    .header-user button[style*="padding:8px"] {
+        padding: 7px !important;
+    }
+
+    /* Inputs maiores para toque */
+    .input-group {
+        padding: 14px 13px;
+        margin-bottom: 10px;
+    }
+    .input-group input,
+    .input-group select {
+        font-size: 16px; /* Evita zoom automático no iOS */
+    }
+
+    /* Botão principal com mais altura para toque */
+    .btn-primary {
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    /* Itens de lista */
+    .list-item {
+        padding: 12px 10px;
+    }
+    .list-item h4 { font-size: 14px; }
+
+    /* Menu inferior com mais espaço */
+    .bottom-nav {
+        padding: 10px 4px 12px;
+        gap: 0;
+    }
+    .nav-item {
+        font-size: 9px;
+        padding: 4px 6px;
+        min-width: 48px;
+    }
+    .nav-item i {
+        font-size: 17px;
+        margin-bottom: 3px;
+    }
+
+    /* Seletores de filtro empilhados */
+    .filtros-extrato {
+        flex-direction: column;
+    }
+    .filtros-extrato select {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+
+    /* Botões de exportação */
+    .aba-acoes-btns {
+        flex-wrap: wrap;
+    }
+
+    /* Formulários com selects lado a lado — empilhar em telas pequenas */
+    .input-group[style*="display:flex;gap:10px"] select {
+        font-size: 14px;
+    }
+
+    /* Tela de login/cadastro */
+    #screen-login, #screen-cadastro {
+        margin-top: 60px;
+        padding: 20px 16px;
+    }
+
+    /* Modal mais ajustado ao mobile */
+    #modal-overlay > div {
+        border-radius: 16px !important;
+        padding: 20px 16px !important;
+    }
+
+    /* Cards de investimento em grade menor */
+    .list-item div[style*="grid-template-columns:1fr 1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+/* Toast Notificações */
+#toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+
+.toast { 
+    padding: 15px 20px; 
+    margin-bottom: 10px; 
+    color: white; 
+    border-radius: 10px; 
+    animation: fadeIn 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}

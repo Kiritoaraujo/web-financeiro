@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestão Financeira</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <div id="toast-box"></div>
+    <div class="wave-top"></div>
+    <button class="theme-toggle" onclick="alternarTema()"><i class="fas fa-moon" id="icon-theme"></i></button>
+
+    <!-- LOGIN -->
+    <div id="screen-login" class="screen active glass-panel">
+        <h2 style="color:var(--primary);text-align:center;margin-bottom:30px;">Entrar</h2>
+        <form id="form-login" onsubmit="fazerLogin(event)">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="login-user" placeholder="Nome de usuário" required autocomplete="username">
+            </div>
+            <div class="input-group password-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="login-senha" placeholder="Senha" required autocomplete="current-password">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('login-senha','login-senha-icon')">
+                    <i class="fas fa-eye" id="login-senha-icon"></i>
+                </button>
+            </div>
+            <button type="submit" class="btn-primary" style="margin-bottom:10px;">Entrar</button>
+        </form>
+        <!-- Separador -->
+        <div style="display:flex;align-items:center;gap:10px;margin:10px 0;">
+            <div style="flex:1;height:1px;background:var(--border);"></div>
+            <span style="color:var(--text-sec);font-size:13px;">ou</span>
+            <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+        <!-- Botão Google -->
+        <button type="button" class="google-btn" onclick="loginComGoogle()">
+            <i class="fab fa-google" style="color:#4285F4;"></i> Entrar com Google
+        </button>
+        <p style="text-align:center;margin-top:15px;font-size:14px;">
+            Não tem conta? <a href="#" onclick="mostrarTela('screen-cadastro')" style="color:var(--primary);">Criar agora</a>
+        </p>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="screen-cadastro" class="screen glass-panel">
+        <h2 style="color:var(--primary);text-align:center;margin-bottom:30px;">Nova Conta</h2>
+        <form id="form-cadastro" onsubmit="cadastrarUsuario(event)">
+            <div class="input-group">
+                <i class="fas fa-id-card"></i>
+                <input type="text" id="cad-nome" placeholder="Nome Completo" required autocomplete="name">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="cad-user" placeholder="Nome de Usuário (para fazer login)" required autocomplete="username">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="cad-email" placeholder="E-mail" required autocomplete="email">
+            </div>
+            <div class="input-group password-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="cad-senha" placeholder="Senha" required autocomplete="new-password">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('cad-senha','cad-senha-icon')">
+                    <i class="fas fa-eye" id="cad-senha-icon"></i>
+                </button>
+            </div>
+            <div class="input-group password-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="cad-senha2" placeholder="Confirmar Senha" required autocomplete="new-password">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('cad-senha2','cad-senha2-icon')">
+                    <i class="fas fa-eye" id="cad-senha2-icon"></i>
+                </button>
+            </div>
+            <button type="submit" class="btn-primary" style="margin-bottom:10px;">Criar Conta</button>
+            <div style="display:flex;align-items:center;gap:10px;margin:10px 0;">
+                <div style="flex:1;height:1px;background:var(--border);"></div>
+                <span style="color:var(--text-sec);font-size:13px;">ou</span>
+                <div style="flex:1;height:1px;background:var(--border);"></div>
+            </div>
+            <button type="button" class="google-btn" onclick="loginComGoogle()">
+                <i class="fab fa-google" style="color:#4285F4;"></i> Continuar com Google
+            </button>
+            <button type="button" class="btn-primary" style="background:var(--text-sec);margin-top:10px;" onclick="mostrarTela('screen-login')">Voltar</button>
+        </form>
+    </div>
+
+    <!-- TELA PRINCIPAL -->
+    <div id="screen-main" class="screen" style="padding-bottom:90px;">
+
+        <!-- HEADER -->
+        <div class="header-user" style="display:flex;align-items:center;justify-content:space-between;padding:0 5px;">
+            <button id="avatar-header" onclick="abrirPerfil()" style="background:none;border:none;cursor:pointer;padding:0;">
+                <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:bold;">?</div>
+            </button>
+            <h2 id="saudacao-texto" style="color:white;flex:1;text-align:center;">Bom dia!</h2>
+            <div style="display:flex;gap:6px;">
+                <button id="btn-apresentacao" onclick="toggleModoApresentacao()" title="Ocultar valores"
+                    style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px;border-radius:50%;cursor:pointer;backdrop-filter:blur(5px);">
+                    <i class="fas fa-eye-slash"></i>
+                </button>
+                <button onclick="gerarComparativo()" title="Comparativo mensal"
+                    style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px;border-radius:50%;cursor:pointer;backdrop-filter:blur(5px);">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+                <button onclick="mostrarPrevisaoSaldo()" title="Previsão de saldo"
+                    style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px;border-radius:50%;cursor:pointer;backdrop-filter:blur(5px);">
+                    <i class="fas fa-calendar-check"></i>
+                </button>
+                <button onclick="gerarRelatorioPDF()" title="Relatório PDF"
+                    style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px;border-radius:50%;cursor:pointer;backdrop-filter:blur(5px);">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SALDO -->
+        <div class="balance-card glass-panel">
+            <h3>Saldo Atual</h3>
+            <h1 id="saldo-atual">R$ 0,00</h1>
+        </div>
+
+        <!-- ABA EXTRATO -->
+        <div id="aba-extrato" class="tab-content active glass-panel">
+            <h3 style="margin-bottom:10px;">Novo Lançamento</h3>
+            <form onsubmit="adicionarTransacao(event)" style="margin-bottom:20px;" id="form-transacao">
+                <div class="input-group"><i class="fas fa-tag"></i><input type="text" id="trans-desc" placeholder="Descrição" required></div>
+                <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="text" id="trans-valor" placeholder="Valor" required></div>
+                <div class="input-group"><i class="fas fa-calendar"></i><input type="date" id="trans-data" required></div>
+                <div class="input-group" style="display:flex;gap:10px;">
+                    <select id="trans-tipo" style="flex:1;" onchange="atualizarCategorias()">
+                        <option value="despesa">Despesa (-)</option>
+                        <option value="receita">Ganho (+)</option>
+                    </select>
+                    <select id="trans-categoria" style="flex:1;" onchange="checarCategoriaPersonalizada()">
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="contas">Contas</option>
+                        <option value="outros">Outros</option>
+                        <option value="personalizada">Personalizada</option>
+                    </select>
+                </div>
+                <div class="input-group" id="div-categoria-personalizada" style="display:none;">
+                    <i class="fas fa-edit"></i><input type="text" id="trans-categoria-personalizada" placeholder="Nome da categoria">
+                </div>
+                <div style="display:flex;gap:10px;margin-top:5px;">
+                    <button type="button" id="btn-cancelar-edicao" onclick="cancelarEdicao()" class="btn-primary" style="background:#ccc;color:#000;display:none;flex:1;">Cancelar</button>
+                    <button type="submit" id="btn-adicionar-trans" class="btn-primary" style="flex:1;">Adicionar</button>
+                </div>
+            </form>
+
+            <canvas id="grafico-categorias" width="400" height="200" style="margin-bottom:20px;display:none;"></canvas>
+
+            <div style="display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;">
+                <button onclick="exportarDados()" style="flex:1;background:#28a745;padding:10px;border-radius:10px;border:none;color:white;cursor:pointer;font-weight:bold;font-size:13px;min-width:80px;"><i class="fas fa-file-excel"></i> CSV</button>
+                <button onclick="gerarRelatorioPDF()" style="flex:1;background:#e53935;padding:10px;border-radius:10px;border:none;color:white;cursor:pointer;font-weight:bold;font-size:13px;min-width:80px;"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button onclick="baixarBackup()" style="flex:1;background:#17a2b8;padding:10px;border-radius:10px;border:none;color:white;cursor:pointer;font-weight:bold;font-size:13px;min-width:80px;"><i class="fas fa-download"></i> Backup</button>
+                <label style="flex:1;background:#6f42c1;padding:10px;border-radius:10px;border:none;color:white;cursor:pointer;font-weight:bold;font-size:13px;min-width:80px;text-align:center;">
+                    <i class="fas fa-file-import"></i> Importar CSV
+                    <input type="file" accept=".csv,.txt" onchange="importarCSVBancario(this.files[0])" style="display:none;">
+                </label>
+            </div>
+
+            <h3>Extrato</h3>
+            <div class="filtros-extrato" style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+                <select id="filtro-mes" onchange="filtrarExtrato()" style="flex:1;min-width:140px;">
+                    <option value="todos">Todos os meses</option>
+                    <option value="atual">Mês atual</option>
+                </select>
+                <select id="filtro-tipo" onchange="filtrarExtrato()" style="flex:1;min-width:140px;">
+                    <option value="todos">Todos os tipos</option>
+                    <option value="despesa">Despesas</option>
+                    <option value="receita">Ganhos</option>
+                </select>
+            </div>
+            <div id="lista-extrato"></div>
+        </div>
+
+        <!-- ABA METAS -->
+        <div id="aba-metas" class="tab-content glass-panel">
+            <h3 style="margin-bottom:15px;"><i class="fas fa-piggy-bank"></i> Novas Metas</h3>
+            <form onsubmit="adicionarMeta(event)" style="margin-bottom:20px;">
+                <div class="input-group"><i class="fas fa-bullseye"></i><input type="text" id="meta-nome" placeholder="Qual o objetivo?" required></div>
+                <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="text" id="meta-valor" placeholder="Valor Total Necessário" required></div>
+                <button type="submit" class="btn-primary">Criar Meta</button>
+            </form>
+            <div id="lista-metas"></div>
+        </div>
+
+        <!-- ABA RECORRENTES -->
+        <div id="aba-recorrentes" class="tab-content glass-panel">
+            <h3 style="margin-bottom:15px;"><i class="fas fa-sync-alt"></i> Recorrentes</h3>
+            <form onsubmit="adicionarRecorrente(event)" style="margin-bottom:20px;">
+                <div class="input-group"><i class="fas fa-tag"></i><input type="text" id="rec-desc" placeholder="Descrição (ex: Aluguel)" required></div>
+                <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="text" id="rec-valor" placeholder="Valor" required></div>
+                <div class="input-group"><i class="fas fa-calendar-day"></i><input type="number" id="rec-dia" placeholder="Dia do mês (1-28)" min="1" max="28" required></div>
+                <div class="input-group" style="display:flex;gap:10px;">
+                    <select id="rec-tipo" style="flex:1;">
+                        <option value="despesa">Despesa (-)</option>
+                        <option value="receita">Ganho (+)</option>
+                    </select>
+                    <select id="rec-categoria" style="flex:1;">
+                        <option value="contas">Contas</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="salario">Salário</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Criar Recorrente</button>
+            </form>
+            <div id="lista-recorrentes"></div>
+        </div>
+
+        <!-- ABA CLT -->
+        <div id="aba-clt" class="tab-content glass-panel">
+            <h3 style="margin-bottom:15px;"><i class="fas fa-clock"></i> Cálculo CLT</h3>
+            <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="clt-salario" placeholder="Salário mensal bruto (R$)"></div>
+            <div class="input-group"><i class="fas fa-calendar-day"></i><input type="number" id="clt-dias" placeholder="Dias trabalhados no mês"></div>
+            <div class="input-group"><i class="fas fa-bus"></i><input type="number" step="0.01" id="clt-conducao" placeholder="Condução por dia (R$)"></div>
+            <div class="input-group"><i class="fas fa-utensils"></i><input type="number" step="0.01" id="clt-refeicao" placeholder="Vale-refeição por dia (R$)"></div>
+            <button onclick="calcularCLT()" class="btn-primary">Calcular</button>
+            <div id="resultado-clt" style="margin-top:20px;display:none;" class="balance-card"></div>
+        </div>
+
+        <!-- ABA INVEST -->
+        <div id="aba-invest" class="tab-content glass-panel">
+            <h3 style="margin-bottom:15px;"><i class="fas fa-chart-line"></i> Comprar Ativos</h3>
+            <form onsubmit="adicionarInvestimento(event)" style="margin-bottom:20px;">
+                <div class="input-group">
+                    <i class="fas fa-building"></i>
+                    <select id="inv-select" onchange="verificarNovoFundo()" style="width:100%;border:none;outline:none;background:transparent;color:var(--text-main);">
+                        <option value="novo">+ Adicionar Novo Fundo</option>
+                    </select>
+                </div>
+                <div class="input-group" id="div-inv-nome">
+                    <i class="fas fa-font"></i><input type="text" id="inv-nome" placeholder="Nome do Fundo (Ex: MXRF11)">
+                </div>
+                <div class="input-group"><i class="fas fa-layer-group"></i><input type="number" id="inv-qtd" placeholder="Qtd Cotas" required></div>
+                <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="inv-preco" placeholder="Preço Pago" required></div>
+                <button type="submit" class="btn-primary">Registrar Compra</button>
+            </form>
+            <canvas id="grafico-invest" width="400" height="200" style="margin-bottom:20px;display:none;"></canvas>
+            <div id="lista-invest"></div>
+        </div>
+
+        <!-- ABA INDEPENDÊNCIA FINANCEIRA -->
+        <div id="aba-independencia" class="tab-content glass-panel">
+            <h3 style="margin-bottom:15px;"><i class="fas fa-piggy-bank"></i> Independência Financeira</h3>
+            <p style="font-size:12px;color:var(--text-sec);margin-bottom:15px;">Calcule quanto você precisa ter investido para viver de renda</p>
+            <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="gasto-mensal" placeholder="Quanto você gasta por mês? (R$)"></div>
+            <div class="input-group"><i class="fas fa-percent"></i><input type="number" step="0.01" id="taxa-retorno-if" placeholder="Taxa de retorno anual (%) - ex: 6" value="6"></div>
+            <button onclick="calcularIndependenciaFinanceira()" class="btn-primary">Calcular</button>
+            <div id="resultado-if" style="margin-top:20px;display:none;" class="balance-card"></div>
+        </div>
+
+        <!-- ABA JUROS COMPOSTOS -->
+        <div id="aba-juros" class="tab-content glass-panel">
+            <h3 style="margin-bottom:15px;"><i class="fas fa-chart-line"></i> Simulador de Juros Compostos</h3>
+            <p style="font-size:12px;color:var(--text-sec);margin-bottom:15px;">Projete quanto R$ 100/mês viram em 10 anos</p>
+            <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="aporte-mensal" placeholder="Aporte mensal (R$)" value="100"></div>
+            <div class="input-group"><i class="fas fa-percent"></i><input type="number" step="0.01" id="taxa-retorno-jc" placeholder="Taxa de retorno anual (%) - ex: 10" value="10"></div>
+            <div class="input-group"><i class="fas fa-calendar"></i><input type="number" id="anos-jc" placeholder="Quantos anos?" value="10"></div>
+            <button onclick="calcularJurosCompostos()" class="btn-primary">Simular</button>
+            <div id="resultado-jc" style="margin-top:20px;display:none;" class="balance-card"></div>
+        </div>
+
+        <button onclick="logout()" style="margin-top:10px;background:var(--danger);padding:10px;border-radius:10px;border:none;color:white;width:100%;cursor:pointer;font-weight:bold;">
+            <i class="fas fa-sign-out-alt"></i> Sair da Conta
+        </button>
+    </div>
+
+    <!-- MENU INFERIOR -->
+    <div class="bottom-nav glass-panel" id="menu-inferior" style="display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;">
+        <button class="nav-item active" onclick="trocarAba('aba-extrato', this)"><i class="fas fa-list"></i>Extrato</button>
+        <button class="nav-item" onclick="trocarAba('aba-metas', this)"><i class="fas fa-piggy-bank"></i>Metas</button>
+        <button class="nav-item" onclick="trocarAba('aba-recorrentes', this)"><i class="fas fa-sync-alt"></i>Fixas</button>
+        <button class="nav-item" onclick="trocarAba('aba-clt', this)"><i class="fas fa-clock"></i>CLT</button>
+        <button class="nav-item" onclick="trocarAba('aba-invest', this)"><i class="fas fa-chart-line"></i>Invest</button>
+        <button class="nav-item" onclick="trocarAba('aba-independencia', this)"><i class="fas fa-flag"></i>IF</button>
+        <button class="nav-item" onclick="trocarAba('aba-juros', this)"><i class="fas fa-percent"></i>Juros</button>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script src="firebase-config.js"></script>
+<script src="database.js"></script>
+<script src="app.js"></script>
+<script src="eastereggs.js"></script>
+<script src="extrato.js"></script>
+<script src="metas.js"></script>
+<script src="clt.js"></script>
+<script src="invest.js"></script>
+<script src="recorrentes.js"></script>
+<script src="conquistas.js"></script>
+<script src="perfil.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
