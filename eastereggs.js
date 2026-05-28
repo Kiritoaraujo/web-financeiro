@@ -6,29 +6,27 @@
 function verificarModoJulius(valorDespesa) {
     const usr = db.usuarios[usuarioLogado];
     if (usr.saldo < valorDespesa) {
-        // Só mostra uma vez quando fica negativo
-        if (!usr.primeiroSaldoNegativo) {
-            const juliosHTML = `
-                <div style="text-align:center;">
-                    <p style="font-size:24px;margin-bottom:10px;">😐</p>
-                    <p style="font-size:18px;font-weight:bold;color:var(--text-main);margin-bottom:10px;">"Se você não comprar nada, o desconto é maior!"</p>
-                    <p style="color:var(--text-sec);font-size:13px;">Saldo insuficiente: R$ ${usr.saldo.toFixed(2)}</p>
-                </div>`;
-            
-            abrirModal({
-                titulo: '💸 Aviso - Julius',
-                mensagem: juliosHTML,
-                confirmLabel: 'Entendi',
-                confirmStyle: 'danger',
-                onConfirm: () => {}
-            });
-            usr.primeiroSaldoNegativo = true;
-            if (!usr.juliusEggEncontrado) {
-                usr.juliusEggEncontrado = true;
-                usr.easterEggsEncontrados = (usr.easterEggsEncontrados || 0) + 1;
-            }
+        // Registrar easter egg apenas na primeira vez
+        if (!usr.juliusEggEncontrado) {
+            usr.juliusEggEncontrado = true;
+            usr.easterEggsEncontrados = (usr.easterEggsEncontrados || 0) + 1;
             salvarDB();
         }
+
+        const juliosHTML = `
+            <div style="text-align:center;">
+                <p style="font-size:24px;margin-bottom:10px;">😐</p>
+                <p style="font-size:18px;font-weight:bold;color:var(--text-main);margin-bottom:10px;">"Se você não comprar nada, o desconto é maior!"</p>
+                <p style="color:var(--text-sec);font-size:13px;">Saldo insuficiente: R$ ${usr.saldo.toFixed(2)}</p>
+            </div>`;
+        
+        abrirModal({
+            titulo: '💸 Aviso - Julius',
+            mensagem: juliosHTML,
+            confirmLabel: 'Entendi',
+            confirmStyle: 'danger',
+            onConfirm: () => {}
+        });
         return false;
     }
     return true;

@@ -205,8 +205,9 @@ function renderizarExtrato() {
         if (filtroTipo !== 'todos') okTipo = t.tipo === filtroTipo;
         if (filtroMes === 'atual') {
             const hoje = new Date();
-            const dt = new Date(t.data);
-            okMes = hoje.getFullYear() === dt.getFullYear() && hoje.getMonth() === dt.getMonth();
+            const anoMesHoje = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+            // Compare prefix directly — avoids UTC date parsing off-by-one
+            okMes = t.data.startsWith(anoMesHoje);
         }
 
         return okTipo && okMes;
@@ -228,8 +229,8 @@ function renderizarExtrato() {
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <h4 style="color:${isDespesa ? 'var(--danger)' : 'var(--success)'}; margin-right: 5px;">R$ ${Math.abs(t.valor).toFixed(2)}</h4>
-                    <button onclick="editarTransacao(${t.id})" style="background:none; border:none; color:var(--text-sec); cursor:pointer;"><i class="fas fa-edit"></i></button>
-                    <button onclick="excluirTransacao(${t.id})" style="background:none; border:none; color:var(--text-sec); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    <button data-action="editar" data-id="${t.id}" style="background:none; border:none; color:var(--text-sec); cursor:pointer;"><i class="fas fa-edit"></i></button>
+                    <button data-action="excluir" data-id="${t.id}" style="background:none; border:none; color:var(--text-sec); cursor:pointer;"><i class="fas fa-trash"></i></button>
                 </div>
             </div>`;
     });
@@ -267,3 +268,13 @@ function exportarDados() {
 }
 
 prepararTransacaoParaCadastro();
+
+// Event delegation for extrato list buttons (IDs contain decimals, can't use inline onclick)
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = parseFloat(btn.dataset.id);
+    if (action === 'editar') editarTransacao(id);
+    else if (action === 'excluir') excluirTransacao(id);
+});
