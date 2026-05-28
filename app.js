@@ -144,11 +144,11 @@ function fecharModal() {
 
 // ── INICIALIZAÇÃO ─────────────────────────────────────────────────────────────
 
-window.onload = () => {
+window.addEventListener('load', () => {
     if (localStorage.getItem('tema') === 'dark') alternarTema();
     const saudacao = document.getElementById('saudacao-texto');
     if (saudacao) saudacao.addEventListener('click', ativarEasterEgg);
-};
+});
 
 function mostrarTela(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));

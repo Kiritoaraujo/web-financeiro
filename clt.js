@@ -37,7 +37,8 @@ function calcularCLT() {
 
 function registrarCLTNoExtrato(valor) {
     const usr = db.usuarios[usuarioLogado];
-    const data = new Date().toISOString().split('T')[0];
+    const hoje = new Date();
+    const data = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
     
     abrirModal({
         titulo: 'Registrar Salário CLT?',

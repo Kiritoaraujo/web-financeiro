@@ -182,12 +182,21 @@ function logout() {
 
 function carregarDados() {
     const usr = migrarUsuario(db.usuarios[usuarioLogado]);
+    db.usuarios[usuarioLogado] = usr; // Bug 2 fix: persist migration back to db
     salvarDB();
 
-    const hoje = new Date().toISOString().split('T')[0];
+    // Bug 8 fix: use local date string to avoid UTC off-by-one
+    function localDateStr(d) {
+        const dt = d || new Date();
+        return dt.getFullYear() + '-' +
+            String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+            String(dt.getDate()).padStart(2, '0');
+    }
+
+    const hoje = localDateStr();
     if (usr.ultimoDiaAcesso !== hoje) {
-        const ultimoAcessoData = usr.ultimoDiaAcesso ? new Date(usr.ultimoDiaAcesso) : null;
-        const hojeData = new Date(hoje);
+        const ultimoAcessoData = usr.ultimoDiaAcesso ? new Date(usr.ultimoDiaAcesso + 'T12:00:00') : null;
+        const hojeData = new Date(hoje + 'T12:00:00');
         if (ultimoAcessoData) {
             const diasDiferenca = Math.floor((hojeData - ultimoAcessoData) / (1000 * 60 * 60 * 24));
             if (diasDiferenca === 1) {

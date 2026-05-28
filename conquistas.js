@@ -51,6 +51,7 @@ function verificarConquistas() {
     const usr = db.usuarios[usuarioLogado];
     if (!usr.conquistas) usr.conquistas = [];
 
+    let conquistouAlgo = false;
     const tem = (id) => usr.conquistas.some(c => c.id === id);
     const ganhar = (id) => {
         if (tem(id)) return;
@@ -58,8 +59,8 @@ function verificarConquistas() {
         if (!conquista) return;
         usr.conquistas.push(conquista);
         adicionarXP(50); // +50 XP ao desbloquear conquista
-        salvarDB();
         mostrarConquista(conquista);
+        conquistouAlgo = true;
     };
 
     if (usr.extrato.length >= 1)  ganhar('primeiro_lancamento');
@@ -80,6 +81,9 @@ function verificarConquistas() {
     const todasAsConquistas = LISTA_CONQUISTAS.filter(c => c.id !== 'platina');
     const temTodas = todasAsConquistas.every(c => tem(c.id));
     if (temTodas) ganhar('platina');
+
+    // Bug 4 fix: only save once after all checks, not once per ganhar()
+    if (conquistouAlgo) salvarDB();
 }
 
 function mostrarConquista(conquista) {
