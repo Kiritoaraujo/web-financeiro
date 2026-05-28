@@ -231,7 +231,8 @@ function aplicarCorPersonalizada(cor) {
 
 function carregarCorPersonalizada() {
     const usr = db.usuarios[usuarioLogado];
-    if (usr.corPersonalizada && !document.body.classList.contains('dark-theme')) {
+    // Apply custom colour regardless of theme — dark theme variables handle the rest
+    if (usr.corPersonalizada) {
         document.documentElement.style.setProperty('--primary', usr.corPersonalizada);
     }
 }

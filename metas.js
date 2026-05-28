@@ -43,7 +43,7 @@ function depositarMeta(id) {
             const valorDeposito = parseFloat(String(val).replace(',', '.'));
             if (isNaN(valorDeposito) || valorDeposito <= 0) return showToast("Valor inválido.", "error");
             
-            // Verificar Modo Julius para despesa potencial
+            // Bug 9 fix: pass parsed number, not raw string
             if (!verificarModoJulius(valorDeposito)) return;
             
             usr.saldo -= valorDeposito;
